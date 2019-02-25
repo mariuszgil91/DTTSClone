@@ -33,7 +33,7 @@ class GameScene: SKScene {
         addChild(hudNode)
         
         
-        
+        physicsWorld.gravity = CGVector(dx: 0.0, dy: -3.0)
         startGameLabel.text = "tap to play"
         startGameLabel.fontSize = 30
         startGameLabel.fontColor = SKColor.green
@@ -45,7 +45,7 @@ class GameScene: SKScene {
         player.physicsBody?.isDynamic = false
         player.physicsBody?.allowsRotation = false
         player.position = CGPoint(x: frame.midX, y: frame.midY)
-        
+        player.physicsBody?.velocity = CGVector(dx: 0.0, dy: 0.0)
         player.physicsBody?.restitution = 1.0
         player.physicsBody?.friction = 0.0
         player.physicsBody?.angularDamping = 0.0
@@ -72,31 +72,17 @@ class GameScene: SKScene {
         player.physicsBody?.isDynamic = true
         
         // 4
-        player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
+        //physicsWorld.gravity = CGVector(dx: 0.0, dy: 2.0)
+        //player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
         
         print("touch")
         
+        for _ in touches {
+            player.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
+        }
+        
     }
     
-
-//    func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent) {
-//
-//
-//            // 2
-//            // Remove the Tap to Start node
-//            startGameLabel.removeFromParent()
-//
-//            // 3
-//            // Start the player by putting them into the physics simulation
-//            player.physicsBody?.isDynamic = true
-//
-//            // 4
-//            player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
-//
-//            print("touch")
-//
-//
-//
-//    }
     
 }
