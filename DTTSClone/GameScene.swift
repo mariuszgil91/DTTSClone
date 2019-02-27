@@ -9,7 +9,7 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
 
     var backgroundNode: SKNode!
     var midgroundNode: SKNode!
@@ -18,22 +18,23 @@ class GameScene: SKScene {
     var startGameLabel = SKLabelNode(fontNamed: "Chalkduster")
     let player = SKShapeNode(circleOfRadius: 20)
     
+    let sceneEdgeCategory: UInt32 = 1 << 0
+    let playerCategory: UInt32 = 1 << 1
     
+    var edgeContact = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        
     }
     
     override init(size: CGSize) {
+        
         super.init(size: size)
+        
         //backgroundColor = SKColor.black
         hudNode = SKNode()
         addChild(hudNode)
         
-        
-        physicsWorld.gravity = CGVector(dx: 0.0, dy: -3.0)
         startGameLabel.text = "tap to play"
         startGameLabel.fontSize = 30
         startGameLabel.fontColor = SKColor.green
@@ -51,38 +52,58 @@ class GameScene: SKScene {
         player.physicsBody?.angularDamping = 0.0
         player.physicsBody?.linearDamping = 0.0
         player.isUserInteractionEnabled = true
+        
+        self.physicsWorld.gravity = CGVector(dx: 2, dy: -2)
+        
         addChild(player)
-        
-        
-    }
     
+    }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
-//        let touch:UITouch = touches.first!
-//        let positionInScene = touch.location(in: self)
-//        let touchedNode = self.atPoint(positionInScene)
-//
-        // 2
-        // Remove the Tap to Start node
+
         startGameLabel.removeFromParent()
-        
-        // 3
-        // Start the player by putting them into the physics simulation
+
         player.physicsBody?.isDynamic = true
         
-        // 4
-        //physicsWorld.gravity = CGVector(dx: 0.0, dy: 2.0)
-        //player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
+
         
-        print("touch")
+        print("screen touched")
         
         for _ in touches {
             player.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
+            
         }
         
     }
     
+    override func didMove(to view: SKView) {
+        self.physicsWorld.contactDelegate = self
+        self.scaleMode = .aspectFit
+        self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+        self.physicsBody?.categoryBitMask = sceneEdgeCategory
+        player.physicsBody?.categoryBitMask = playerCategory
+        player.physicsBody?.contactTestBitMask = sceneEdgeCategory
+        
+    }
     
+    func didBegin(_ contact: SKPhysicsContact){
+    
+        if edgeContact == true {
+            edgeContact = false
+            self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
+        } else {
+            edgeContact = true
+            self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
+        }
+        
+        
+        
+        
+//        print("didBeginContact entered for \(String(describing: contact.bodyA.node!.name)) and \(String(describing: contact.bodyB.node!.name))")
+        
+        
+    }
+
 }
