@@ -23,6 +23,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var edgeContact = false
     
+    let maxSpeed = CGVector(dx: 100, dy: 100)
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -52,8 +54,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.angularDamping = 0.0
         player.physicsBody?.linearDamping = 0.0
         player.isUserInteractionEnabled = true
+        player.physicsBody?.velocity.dx = 100
         
-        self.physicsWorld.gravity = CGVector(dx: 2, dy: -2)
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: -2)
         
         addChild(player)
     
@@ -63,16 +66,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     {
 
         startGameLabel.removeFromParent()
-
         player.physicsBody?.isDynamic = true
-        
-
-        
         print("screen touched")
         
         for _ in touches {
-            player.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-            player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 15))
+            
+            if ((player.physicsBody?.velocity.dy)! < CGFloat(0)) {
+              player.physicsBody?.velocity.dy = 0
+            } else{
+                //print("lece do góry")
+            }
+            
+            player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
             
         }
         
@@ -86,24 +91,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.categoryBitMask = playerCategory
         player.physicsBody?.contactTestBitMask = sceneEdgeCategory
         
+        
     }
     
     func didBegin(_ contact: SKPhysicsContact){
-    
+        
+        
         if edgeContact == true {
             edgeContact = false
-            self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
+            //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
+            player.physicsBody?.velocity.dx = -200
         } else {
             edgeContact = true
-            self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
+            //self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
+            player.physicsBody?.velocity.dx = 200
         }
-        
-        
-        
-        
-//        print("didBeginContact entered for \(String(describing: contact.bodyA.node!.name)) and \(String(describing: contact.bodyB.node!.name))")
-        
-        
+
     }
 
+    override func update(_ currentTime: TimeInterval) {
+
+    }
 }
