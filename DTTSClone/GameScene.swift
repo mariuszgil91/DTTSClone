@@ -17,6 +17,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var hudNode: SKNode!
     var startGameLabel = SKLabelNode(fontNamed: "Chalkduster")
     let player = SKShapeNode(circleOfRadius: 20)
+//    let spike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
     
     let sceneEdgeCategory: UInt32 = 1 << 0
     let playerCategory: UInt32 = 1 << 1
@@ -58,7 +59,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.physicsWorld.gravity = CGVector(dx: 0, dy: -2)
         
+        //spike.position = CGPoint(x: frame.midX - 20, y: frame.midY - 20)
+//        spike.zRotation = 15
+        
         addChild(player)
+        
+        for i in 1...8{
+            
+            // Brick settings
+            let spike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+            spike.physicsBody?.isDynamic = false
+            spike.zRotation = CGFloat(Double.pi) / 4
+            
+            // Brick positioning
+            var xPos = size.width / 6 //CGFloat
+            var xPosInt = Int(xPos) * (i + 1) - 100// Int
+            xPos = CGFloat(xPosInt) // Convert to CGFloat again
+            var yPos = size.height
+            
+            spike.position = CGPoint(x: xPos, y:yPos)
+            
+            self.addChild(spike)
+            
+            print("x position: \(xPos)")
+            print("y position: \(yPos)")
+            
+        }
+        //addChild(spike)
     
     }
 
@@ -67,7 +94,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         startGameLabel.removeFromParent()
         player.physicsBody?.isDynamic = true
-        print("screen touched")
+        //print("screen touched")
         
         for _ in touches {
             
