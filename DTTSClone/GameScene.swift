@@ -67,22 +67,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for i in 1...8{
             
             // Brick settings
-            let spike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
-            spike.physicsBody?.isDynamic = false
-            spike.zRotation = CGFloat(Double.pi) / 4
+            let topSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+            topSpike.physicsBody?.isDynamic = false
+            topSpike.zRotation = CGFloat(Double.pi) / 4
+            
+            let botSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+            botSpike.physicsBody?.isDynamic = false
+            botSpike.zRotation = CGFloat(Double.pi) / 4
             
             // Brick positioning
-            var xPos = size.width / 6 //CGFloat
-            var xPosInt = Int(xPos) * (i + 1) - 100// Int
-            xPos = CGFloat(xPosInt) // Convert to CGFloat again
-            var yPos = size.height
+            var topXPos = size.width / 6 //CGFloat
+            var topXPosInt = Int(topXPos) * (i + 1) - 100// Int
+            topXPos = CGFloat(topXPosInt) // Convert to CGFloat again
+            var topYPos = size.height
             
-            spike.position = CGPoint(x: xPos, y:yPos)
+            var botYPos = CGFloat(0)
             
-            self.addChild(spike)
+            topSpike.position = CGPoint(x: topXPos, y:topYPos)
+            botSpike.position = CGPoint(x: topXPos, y:botYPos)
             
-            print("x position: \(xPos)")
-            print("y position: \(yPos)")
+            self.addChild(topSpike)
+            self.addChild(botSpike)
+            
+            print("x position: \(topXPos)")
+            print("y position: \(botYPos)")
             
         }
         //addChild(spike)
