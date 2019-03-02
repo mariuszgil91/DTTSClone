@@ -24,7 +24,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let playerCategory: UInt32 = 1 << 2
     
     
-    var edgeContact = false
+    var wallContact = false
     
     let maxSpeed = CGVector(dx: 100, dy: 100)
     
@@ -143,30 +143,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
 
         let firstBody = contact.bodyA
-        let secondBody = contact.bodyB
         
-        if edgeContact == true{
-            if firstBody.categoryBitMask == sceneEdgeCategory{
-                edgeContact = false
-                //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
-                player.physicsBody?.velocity.dx = -200
-                print("wall contact")
-            }
+        
+        
+        if firstBody.categoryBitMask == sceneEdgeCategory && wallContact == false{
+            wallContact = true
+            //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
+            player.physicsBody?.velocity.dx = -200
+            print("if wall contact")
 
-        } else if firstBody.categoryBitMask == sceneEdgeCategory{
-            
-            edgeContact = true
+        } else if firstBody.categoryBitMask == spikeCategory {
+            print("spike contact, dead")
+            player.removeFromParent()
+        }else{
+            wallContact = false
             //self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
             player.physicsBody?.velocity.dx = 200
-            print("else")
+            print("else wall contact")
             
-        } else if firstBody.categoryBitMask == spikeCategory {
-            print("you died")
         }
-
-        
-        
     }
+        
+    
 
     override func update(_ currentTime: TimeInterval) {
 
