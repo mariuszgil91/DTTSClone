@@ -22,7 +22,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let sceneEdgeCategory: UInt32 = 1 << 0
     let spikeCategory: UInt32 = 1 << 1
     let playerCategory: UInt32 = 1 << 2
-    
+    var leftSpikes: [SKShapeNode] = []
     
     var wallContact = false
     
@@ -103,25 +103,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             rightSpike.physicsBody?.contactTestBitMask = playerCategory
             
             
-            let leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
-            leftSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
-            leftSpike.physicsBody?.isDynamic = false
-            leftSpike.zRotation = CGFloat(Double.pi) / 4
-            leftSpike.physicsBody?.categoryBitMask = spikeCategory
-            leftSpike.physicsBody?.contactTestBitMask = playerCategory
+//            let leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+//            leftSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
+//            leftSpike.physicsBody?.isDynamic = false
+//            leftSpike.zRotation = CGFloat(Double.pi) / 4
+//            leftSpike.physicsBody?.categoryBitMask = spikeCategory
+//            leftSpike.physicsBody?.contactTestBitMask = playerCategory
             
             topSpike.position = CGPoint(x: topXPos, y:topYPos)
             botSpike.position = CGPoint(x: topXPos, y:botYPos)
             rightSpike.position = CGPoint(x: size.width, y: rightLeftSpikesPosYCGF)
-            leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
+//            leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
 
             
             self.addChild(topSpike)
             self.addChild(botSpike)
-            self.addChild(rightSpike)
-            self.addChild(leftSpike)
+//            self.addChild(rightSpike)
+//            self.addChild(leftSpike)
             
-            print(rightLeftSpikesPosY)
+           // print(rightLeftSpikesPosY)
             
 //            print("x position: \(topXPos)")
 //            print("y position: \(botYPos)")
@@ -141,7 +141,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for _ in touches {
             
             if ((player.physicsBody?.velocity.dy)! < CGFloat(0)) {
-              player.physicsBody?.velocity.dy = 0
+                player.physicsBody?.velocity.dy = 0
             } else{
                 //print("lece do góry")
             }
@@ -162,12 +162,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsBody?.contactTestBitMask = playerCategory
         
         
+        
+        
     }
     
     func didBegin(_ contact: SKPhysicsContact){
         
+        
 
         let firstBody = contact.bodyA
+        
+        let numberOfSprites = 6
         
         
         
@@ -176,6 +181,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
             player.physicsBody?.velocity.dx = -200
             print("if wall contact")
+            
+            for i in 0..<numberOfSprites {
+                let randomNumber = Int.random(in: 2 ... 6)
+                var leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+                var rightLeftSpikesPosY = Int(size.height / 10) * (i + randomNumber) - 40
+                var rightLeftSpikesPosYCGF = CGFloat(rightLeftSpikesPosY)
+                leftSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
+                leftSpike.physicsBody?.isDynamic = false
+                leftSpike.zRotation = CGFloat(Double.pi) / 4
+                leftSpike.physicsBody?.categoryBitMask = spikeCategory
+                leftSpike.physicsBody?.contactTestBitMask = playerCategory
+                leftSpikes.append(leftSpike)
+                leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
+                addChild(leftSpike)
+                print(randomNumber)
+                print(rightLeftSpikesPosYCGF)
+                
+            }
+            
 
         } else if firstBody.categoryBitMask == spikeCategory {
             print("spike contact, dead")
@@ -185,6 +209,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
             player.physicsBody?.velocity.dx = 200
             print("else wall contact")
+            
+            removeChildren(in: leftSpikes)
             
         }
     }
