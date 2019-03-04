@@ -67,7 +67,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         addChild(player)
         
-        for i in 1...8{
+        for i in 1...9{
+            
+            // Brick positioning
+            var topXPos = size.width / 6 //CGFloat
+            var topXPosInt = Int(topXPos) * (i + 1) - 80// Int
+            topXPos = CGFloat(topXPosInt) // Convert to CGFloat again
+            var topYPos = size.height
+            var botYPos = CGFloat(0)
+            
+            var rightLeftSpikesPosY = Int(size.height / 10) * (i + 1) - 40
+            var rightLeftSpikesPosYCGF = CGFloat(rightLeftSpikesPosY)
+            
             
             // Brick settings
             let topSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
@@ -84,19 +95,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             botSpike.physicsBody?.categoryBitMask = spikeCategory
             botSpike.physicsBody?.contactTestBitMask = playerCategory
             
-            // Brick positioning
-            var topXPos = size.width / 6 //CGFloat
-            var topXPosInt = Int(topXPos) * (i + 1) - 100// Int
-            topXPos = CGFloat(topXPosInt) // Convert to CGFloat again
-            var topYPos = size.height
+            let rightSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+            rightSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
+            rightSpike.physicsBody?.isDynamic = false
+            rightSpike.zRotation = CGFloat(Double.pi) / 4
+            rightSpike.physicsBody?.categoryBitMask = spikeCategory
+            rightSpike.physicsBody?.contactTestBitMask = playerCategory
             
-            var botYPos = CGFloat(0)
+            
+            let leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+            leftSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
+            leftSpike.physicsBody?.isDynamic = false
+            leftSpike.zRotation = CGFloat(Double.pi) / 4
+            leftSpike.physicsBody?.categoryBitMask = spikeCategory
+            leftSpike.physicsBody?.contactTestBitMask = playerCategory
             
             topSpike.position = CGPoint(x: topXPos, y:topYPos)
             botSpike.position = CGPoint(x: topXPos, y:botYPos)
+            rightSpike.position = CGPoint(x: size.width, y: rightLeftSpikesPosYCGF)
+            leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
+
             
             self.addChild(topSpike)
             self.addChild(botSpike)
+            self.addChild(rightSpike)
+            self.addChild(leftSpike)
+            
+            print(rightLeftSpikesPosY)
             
 //            print("x position: \(topXPos)")
 //            print("y position: \(botYPos)")
@@ -167,6 +192,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
 
     override func update(_ currentTime: TimeInterval) {
-
+        
     }
 }
