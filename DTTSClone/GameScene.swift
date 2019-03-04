@@ -17,7 +17,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var hudNode: SKNode!
     var startGameLabel = SKLabelNode(fontNamed: "Chalkduster")
     let player = SKShapeNode(circleOfRadius: 20)
-//    let spike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+    var highScore = 0
+    var highScoreLabel = SKLabelNode(fontNamed: "Chalkduster")
     
     let sceneEdgeCategory: UInt32 = 1 << 0
     let spikeCategory: UInt32 = 1 << 1
@@ -40,9 +41,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hudNode = SKNode()
         addChild(hudNode)
         
+        highScoreLabel.text = String(highScore)
+        highScoreLabel.fontSize = 70
+        highScoreLabel.fontColor = SKColor.white
+        highScoreLabel.position = CGPoint(x: frame.midX, y: frame.midY + 200)
+        addChild(highScoreLabel)
+        
         startGameLabel.text = "tap to play"
         startGameLabel.fontSize = 30
-        startGameLabel.fontColor = SKColor.green
+        startGameLabel.fontColor = SKColor.white
         startGameLabel.position = CGPoint(x: frame.midX, y: frame.midY + 50)
         startGameLabel.isUserInteractionEnabled = true
         hudNode.addChild(startGameLabel)
@@ -103,13 +110,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             rightSpike.physicsBody?.contactTestBitMask = playerCategory
             
             
-//            let leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
-//            leftSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
-//            leftSpike.physicsBody?.isDynamic = false
-//            leftSpike.zRotation = CGFloat(Double.pi) / 4
-//            leftSpike.physicsBody?.categoryBitMask = spikeCategory
-//            leftSpike.physicsBody?.contactTestBitMask = playerCategory
-            
             topSpike.position = CGPoint(x: topXPos, y:topYPos)
             botSpike.position = CGPoint(x: topXPos, y:botYPos)
             rightSpike.position = CGPoint(x: size.width, y: rightLeftSpikesPosYCGF)
@@ -118,22 +118,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             self.addChild(topSpike)
             self.addChild(botSpike)
-//            self.addChild(rightSpike)
-//            self.addChild(leftSpike)
-            
-           // print(rightLeftSpikesPosY)
-            
-//            print("x position: \(topXPos)")
-//            print("y position: \(botYPos)")
+
             
         }
-        //addChild(spike)
+
     
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
-
+        
         startGameLabel.removeFromParent()
         player.physicsBody?.isDynamic = true
         //print("screen touched")
@@ -168,19 +162,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact){
         
-        
-
         let firstBody = contact.bodyA
-        
         let numberOfSprites = 6
-        
-        
         
         if firstBody.categoryBitMask == sceneEdgeCategory && wallContact == false{
             wallContact = true
             //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
             player.physicsBody?.velocity.dx = -200
+            highScore += 1
             print("if wall contact")
+            self.updateHighScore()
             
             for i in 0..<numberOfSprites {
                 let randomNumber = Int.random(in: 2 ... 6)
@@ -195,11 +186,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 leftSpikes.append(leftSpike)
                 leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
                 addChild(leftSpike)
-                print(randomNumber)
-                print(rightLeftSpikesPosYCGF)
-                
             }
-            
 
         } else if firstBody.categoryBitMask == spikeCategory {
             print("spike contact, dead")
@@ -211,13 +198,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("else wall contact")
             
             removeChildren(in: leftSpikes)
+            highScore += 1
+            //print(highScore)
+            self.updateHighScore()
             
         }
     }
-        
-    
 
     override func update(_ currentTime: TimeInterval) {
         
+    }
+    
+    func updateHighScore(){
+        
+        highScoreLabel.text = String(highScore)
+        print(highScore)
     }
 }
