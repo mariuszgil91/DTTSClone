@@ -19,15 +19,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var tapToRestartLabel = SKLabelNode(fontNamed: "Chalkduster")
     let player = SKShapeNode(circleOfRadius: 20)
     var highScore = 0
+    var topHighScore = 0
+    var savedScore: Int = UserDefaults.standard.object(forKey: "topHighScore") as! Int
     var isPlayerDead = false
     
     var highScoreLabel = SKLabelNode(fontNamed: "Chalkduster")
     var topHighScoreLabel = SKLabelNode(fontNamed: "Chalkduster")
     
+    
+    
     let sceneEdgeCategory: UInt32 = 1 << 0
     let spikeCategory: UInt32 = 1 << 1
     let playerCategory: UInt32 = 1 << 2
     var leftSpikes: [SKShapeNode] = []
+    var rightSpikes: [SKShapeNode] = []
     
     var wallContact = false
     
@@ -55,6 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         topHighScoreLabel.fontSize = 15
         topHighScoreLabel.fontColor = SKColor.white
         topHighScoreLabel.position = CGPoint(x: 50, y: 40)
+        topHighScoreLabel.text = "Record: \(savedScore)"
         addChild(topHighScoreLabel)
         
         
@@ -147,7 +153,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     {
         
         if isPlayerDead == false{
-            print("touches began")
+            print(savedScore)
             
             startGameLabel.removeFromParent()
             player.physicsBody?.isDynamic = true
@@ -171,11 +177,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //addChild(player)
             player.position = CGPoint(x: frame.midX, y: frame.midY)
             player.physicsBody?.isDynamic = true
-            player.physicsBody?.velocity.dx = 100
-            player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
+            
             highScore = 0
             highScoreLabel.text = String(highScore)
             isPlayerDead = false
+            if wallContact == false{
+                player.physicsBody?.velocity.dx = 100
+                player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
+            } else{
+                player.physicsBody?.velocity.dx = -100
+                player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
+            }
             print("else dead")
         }
         
@@ -204,11 +216,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //self.physicsWorld.gravity = CGVector(dx: -1, dy: -2)
             player.physicsBody?.velocity.dx = -200
             highScore += 1
-            print("if wall contact")
+            //print("if wall contact")
             self.updateHighScore()
             self.updateTopHighScore()
-            
+            removeChildren(in: rightSpikes)
             for i in 0..<numberOfSprites {
+                
                 let randomNumber = Int.random(in: 2 ... 6)
                 var leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
                 var rightLeftSpikesPosY = Int(size.height / 10) * (i + randomNumber) - 40
@@ -221,27 +234,51 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 leftSpikes.append(leftSpike)
                 leftSpike.position = CGPoint(x: 0, y: rightLeftSpikesPosYCGF)
                 addChild(leftSpike)
+                
             }
 
         } else if firstBody.categoryBitMask == spikeCategory && isPlayerDead == false{
-            print("spike contact, dead")
+            //print("spike contact, dead")
             
             player.physicsBody?.isDynamic = false
             isPlayerDead = true
             addChild(tapToRestartLabel)
+            removeChildren(in: leftSpikes)
+            removeChildren(in: rightSpikes)
             
             
         }else{
+            
             wallContact = false
             //self.physicsWorld.gravity = CGVector(dx: 1, dy: -2)
             player.physicsBody?.velocity.dx = 200
-            print("else wall contact")
+            //print("else wall contact")
             
             removeChildren(in: leftSpikes)
             highScore += 1
             //print(highScore)
             self.updateHighScore()
             self.updateTopHighScore()
+            
+            for i in 0..<numberOfSprites{
+                let randomNumber = Int.random(in: 2 ... 6)
+                var rightLeftSpikesPosY = Int(size.height / 10) * (i + randomNumber) - 40
+                var rightLeftSpikesPosYCGF = CGFloat(rightLeftSpikesPosY)
+                
+               
+                
+                var rightSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
+                rightSpike.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 30, height: 30))
+                rightSpike.physicsBody?.isDynamic = false
+                rightSpike.zRotation = CGFloat(Double.pi) / 4
+                rightSpike.physicsBody?.categoryBitMask = spikeCategory
+                rightSpike.physicsBody?.contactTestBitMask = playerCategory
+                rightSpikes.append(rightSpike)
+                rightSpike.position = CGPoint(x: size.width, y: rightLeftSpikesPosYCGF)
+                addChild(rightSpike)
+            }
+            
+
             
         }
     }
@@ -256,10 +293,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateTopHighScore(){
-        var topHighScore = 0
+        
         if highScore >= topHighScore{
             topHighScore = highScore
-            topHighScoreLabel.text = "Record: \(topHighScore)"
+            UserDefaults.standard.set(topHighScore, forKey:"topHighScore")
+            UserDefaults.standard.synchronize()
+            if topHighScore >= savedScore{
+                topHighScoreLabel.text = "Record: \(topHighScore)"
+            } else {
+                topHighScoreLabel.text = "Record: \(savedScore)"
+            }
+            
         }
     }
 }
