@@ -20,7 +20,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let player = SKShapeNode(circleOfRadius: 20)
     var highScore = 0
     var topHighScore = 0
-    //var savedScore: Int = UserDefaults.standard.object(forKey: "topHighScore") as? Int
+    //let savedScore: Int = UserDefaults.standard.object(forKey: "topHighScore") as! Int
     var isPlayerDead = false
     
     var highScoreLabel = SKLabelNode(fontNamed: "Chalkduster")
@@ -56,11 +56,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         highScoreLabel.position = CGPoint(x: frame.midX, y: frame.midY + 200)
         addChild(highScoreLabel)
         
-        topHighScoreLabel.text = String(highScore)
+        //topHighScoreLabel.text = String(highScore)
         topHighScoreLabel.fontSize = 15
         topHighScoreLabel.fontColor = SKColor.white
         topHighScoreLabel.position = CGPoint(x: 50, y: 40)
-        //topHighScoreLabel.text = "Record: \(savedScore)"
+//        if let savedScore: Int = UserDefaults.standard.object(forKey: "topHighScore") as! Int{
+//            topHighScoreLabel.text = "Record: \(savedScore)"
+//
+//        }
+        //topHighScoreLabel.text = "Record: 0"
         addChild(topHighScoreLabel)
         
         
@@ -182,10 +186,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             highScoreLabel.text = String(highScore)
             isPlayerDead = false
             if wallContact == false{
-                player.physicsBody?.velocity.dx = 100
+                player.physicsBody?.velocity.dx = 200
                 player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
             } else{
-                player.physicsBody?.velocity.dx = -100
+                player.physicsBody?.velocity.dx = -200
                 player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 10))
             }
             print("else dead")
@@ -232,7 +236,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             removeChildren(in: rightSpikes)
             for i in 0..<numberOfSprites {
                 
-                let randomNumber = Int.random(in: 2 ... 6)
+                let randomNumber = Int.random(in: 3 ... 6)
                 var leftSpike = SKShapeNode(rectOf: CGSize(width: 30, height: 30))
                 var rightLeftSpikesPosY = Int(size.height / 10) * (i + randomNumber) - 40
                 var rightLeftSpikesPosYCGF = CGFloat(rightLeftSpikesPosY)
@@ -262,7 +266,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.updateTopHighScore()
             
             for i in 0..<numberOfSprites{
-                let randomNumber = Int.random(in: 2 ... 6)
+                let randomNumber = Int.random(in: 3 ... 6)
                 var rightLeftSpikesPosY = Int(size.height / 10) * (i + randomNumber) - 40
                 var rightLeftSpikesPosYCGF = CGFloat(rightLeftSpikesPosY)
                 
@@ -295,17 +299,60 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func updateTopHighScore(){
         
-        if highScore >= topHighScore{
+        print("top: \(topHighScore)")
+        print("score: \(highScore)")
+        
+        if highScore > topHighScore {
+            
             topHighScore = highScore
-            UserDefaults.standard.set(topHighScore, forKey:"topHighScore")
-            UserDefaults.standard.synchronize()
-            topHighScoreLabel.text = "Record: \(topHighScore)"
-//            if topHighScore >= savedScore{
-//                topHighScoreLabel.text = "Record: \(topHighScore)"
-//            } else {
-//                topHighScoreLabel.text = "Record: \(savedScore)"
-//            }
+            
+            if let savedScore = UserDefaults.standard.object(forKey: "topHighScore"){
+                
+                if topHighScore > savedScore as! Int{
+                    
+                    UserDefaults.standard.set(topHighScore, forKey:"topHighScore")
+                    UserDefaults.standard.synchronize()
+                    
+                    
+                    topHighScoreLabel.text = "Record: \(topHighScore)"
+                    print("saved: \(savedScore)")
+                }else{
+                    topHighScoreLabel.text = "Record: \(savedScore)"
+                }
+                
+                
+            }else{
+                
+                
+                UserDefaults.standard.set(topHighScore, forKey:"topHighScore")
+                UserDefaults.standard.synchronize()
+                topHighScoreLabel.text = "Record: \(topHighScore)"
+                
+            }
+            
             
         }
+        print("--------------------")
+        
+
+//        if let savedScore: Int = UserDefaults.standard.object(forKey: "topHighScore") as? Int{
+//
+//
+//
+//
+//            if highScore >= savedScore{
+//                topHighScore = highScore
+//                if topHighScore >= savedScore {
+//                    UserDefaults.standard.set(topHighScore, forKey:"topHighScore")
+//                    UserDefaults.standard.synchronize()
+//                    topHighScoreLabel.text = "Record: \(savedScore)"
+//                    print("saved")
+//                }
+//
+//            }
+ //       }
+
+        
+        
     }
 }
